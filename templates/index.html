@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NeuroState Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; }
+        .container { width: 80%; margin: auto; padding-top: 50px; }
+        .dangerous { color: #ff4d4d; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Мониторинг когнитивных зон</h2>
+        <canvas id="stateChart"></canvas>
+        <div style="margin-top: 20px;">
+            <input type="number" id="levelInput" min="1" max="8" placeholder="Зона (1-8)">
+            <button onclick="sendData()">Зафиксировать состояние</button>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('stateChart').getContext('2d');
+        const labels = {{ labels | tojson }};
+        const values = {{ values | tojson }};
+
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Уровень напряжения',
+                data: values,
+                borderColor: '#00f2ff',
+                backgroundColor: 'rgba(0, 242, 255, 0.2)',
+                fill: true,
+                tension: 0.4
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                plugins: {
+                    // Кастомный плагин для закрашивания фоновых зон
+                    beforeDraw: (chart) => {
+                        const {ctx, chartArea, scales: {y}} = chart;
+                        const zones = [
+                            {limit: 3, color: 'rgba(75, 192, 192, 0.1)'}, // Спокойствие
+                            {limit: 6, color: 'rgba(255, 206, 86, 0.1)'}, // Усталость
+                            {limit: 8, color: 'rgba(255, 99, 132, 0.2)'}  // DANGEROUS ZONE
+                        ];
+                        // Логика отрисовки прямоугольников зон... (для краткости)
+                    }
+                },
+                scales: {
+                    y: { min: 1, max: 8, grid: { color: '#333' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        };
+
+        const myChart = new Chart(ctx, config);
+
+        async function sendData() {
+            const level = document.getElementById('levelInput').value;
+            await fetch('/log', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({level: parseInt(level)})
+            });
+            location.reload();
+        }
+    </script>
+</body>
+</html>

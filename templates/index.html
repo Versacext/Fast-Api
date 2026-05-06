@@ -12,6 +12,11 @@
 <body>
     <div class="container">
         <h2>Мониторинг когнитивных зон</h2>
+        
+        <p style="color: #00f2ff; font-weight: bold; margin-bottom: 20px;">
+            Статус: {{ message }}
+        </p>
+
         <canvas id="stateChart"></canvas>
         <div style="margin-top: 20px;">
             <input type="number" id="levelInput" min="1" max="8" placeholder="Зона (1-8)">
@@ -41,15 +46,13 @@
             data: data,
             options: {
                 plugins: {
-                    // Кастомный плагин для закрашивания фоновых зон
                     beforeDraw: (chart) => {
                         const {ctx, chartArea, scales: {y}} = chart;
                         const zones = [
-                            {limit: 3, color: 'rgba(75, 192, 192, 0.1)'}, // Спокойствие
-                            {limit: 6, color: 'rgba(255, 206, 86, 0.1)'}, // Усталость
-                            {limit: 8, color: 'rgba(255, 99, 132, 0.2)'}  // DANGEROUS ZONE
+                            {limit: 3, color: 'rgba(75, 192, 192, 0.1)'}, 
+                            {limit: 6, color: 'rgba(255, 206, 86, 0.1)'}, 
+                            {limit: 8, color: 'rgba(255, 99, 132, 0.2)'}  
                         ];
-                        // Логика отрисовки прямоугольников зон... (для краткости)
                     }
                 },
                 scales: {
